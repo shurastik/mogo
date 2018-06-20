@@ -1,21 +1,52 @@
 <?php
+declare(strict_types=1);
 
 namespace AppBundle\Controller;
 
+use Mogo\TournamentService;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 class DefaultController extends Controller
 {
     /**
+     * @var TournamentService
+     */
+    private $tournamentService;
+
+    /**
+     * DefaultController constructor.
+     * @param TournamentService $tournamentService
+     */
+    public function __construct(TournamentService $tournamentService)
+    {
+        $this->tournamentService = $tournamentService;
+    }
+
+    /**
      * @Route("/", name="homepage")
      */
-    public function indexAction(Request $request)
+    public function indexAction(): Response
     {
-        // replace this example code with whatever you need
         return $this->render('default/index.html.twig', [
-            'base_dir' => realpath($this->getParameter('kernel.project_dir')).DIRECTORY_SEPARATOR,
+            'tournaments' => $this->tournamentService->findAll(),
+        ]);
+    }
+
+    public function createTournamentAction()
+    {
+    }
+
+    /**
+     * @Route("/{id}", name="tournament", requirements={"id": ".+"}, options={"expose": true})
+     * @param string $id
+     * @return Response
+     */
+    public function tournamentAction(string $id): Response
+    {
+        return $this->render('default/tournament.html.twig', [
+            'tournament' => $this->tournamentService->find($id),
         ]);
     }
 }

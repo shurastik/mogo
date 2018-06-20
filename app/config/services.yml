@@ -33,3 +33,12 @@ services:
     # AppBundle\Service\ExampleService:
     #     arguments:
     #         $someArgument: 'some_value'
+    # add more services, or override services that need manual wiring
+
+    Mogo\Repository\TournamentRepository:
+        factory: ['@doctrine.orm.default_entity_manager', getRepository]
+        arguments:
+            - Mogo\Tournament
+    Mogo\TournamentService:
+        arguments:
+            - '@Mogo\Repository\TournamentRepository'

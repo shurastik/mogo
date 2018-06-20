@@ -19,7 +19,7 @@ use Ramsey\Uuid\UuidInterface;
 /**
  * Class Tournament
  * @package Mogo
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass="Mogo\Repository\TournamentRepository")
  * @ORM\Table(name="tournaments")
  */
 class Tournament
@@ -257,5 +257,21 @@ class Tournament
         }
 
         return $res;
+    }
+
+    /**
+     * @return UuidInterface
+     */
+    public function getId(): UuidInterface
+    {
+        return $this->id;
+    }
+
+    /**
+     * @return string
+     */
+    public function getName(): string
+    {
+        return $this->name;
     }
 }
