@@ -67,10 +67,12 @@ class TournamentTest extends CommonTestCase
         $matchUpGenerator = $this->createMock(MatchUpGenerator::class);
         $matchUpGenerator->expects(self::once())
             ->method('create')
-            ->willReturn( [
-                new Tournament\PlayOff\MatchUp($teams[0], $teams[1]),
-                new Tournament\PlayOff\MatchUp($teams[2], $teams[3]),
-            ]);
+            ->willReturn(
+                [
+                    new Tournament\PlayOff\MatchUp($teams[0], $teams[1]),
+                    new Tournament\PlayOff\MatchUp($teams[2], $teams[3]),
+                ]
+            );
         $tournament->startPlayoff($matchUpGenerator);
         $final = $tournament->getFinalMatch();
         self::assertEquals($teams[0], $final->getLeft()->getFirst());
@@ -87,5 +89,22 @@ class TournamentTest extends CommonTestCase
         $final->complete(new Result(5, 10));
 
         self::assertEquals($teams[3], $final->getWinner());
+
+        self::assertEquals($teams[1], $tournament->getThirdPlaceMatch()->getFirst());
+        self::assertEquals($teams[2], $tournament->getThirdPlaceMatch()->getSecond());
+
+        $tournament->getThirdPlaceMatch()->complete(new Result(3, 2));
+
+        self::assertEquals($teams[1], $tournament->getThirdPlaceMatch()->getWinner());
+
+        self::assertEquals(
+            [
+                $teams[3],
+                $teams[0],
+                $teams[1],
+                $teams[2],
+            ],
+            $tournament->getFinalRating()
+        );
     }
 }

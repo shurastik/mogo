@@ -5,6 +5,7 @@ namespace Mogo;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\Criteria;
 use Mogo\Exception\IllegalStateException;
 use Mogo\Exception\InvalidArgument;
 use Mogo\Tournament\Match;
@@ -31,11 +32,11 @@ class Tournament
     /**
      * Root node of playoff matches binary tree
      *
-     * @var Tournament\Match\PlayOffMatch
+     * @var Tournament\Match\PlayOffMatch|null
      */
     private $finalMatch;
     /**
-     * @todo Maybe, for more agile model here should be list with games 3/4, 5/6, ...
+     * @todo Maybe, for more flexible model here should be list with games 3/4, 5/6, ...
      * @var Tournament\Match\PlayOffMatch
      */
     private $thirdPlaceMatch;
@@ -52,6 +53,7 @@ class Tournament
         $this->id = Uuid::uuid4();
         $this->regularMatches = new ArrayCollection();
         $this->teams = new ArrayCollection();
+        $this->thirdPlaceMatch = new Match\PlayOffMatch($this);
     }
 
     /**
@@ -160,6 +162,14 @@ class Tournament
     /**
      * @return bool
      */
+    public function isPlayOffComplete(): bool
+    {
+        return $this->isPlayOffStarted() && $this->finalMatch->isCompleted() && $this->thirdPlaceMatch->isCompleted();
+    }
+
+    /**
+     * @return bool
+     */
     public function allRegularMatchesCompleted(): bool
     {
         return 0 === $this->regularMatches
@@ -189,5 +199,44 @@ class Tournament
             }
             $match->setMatchUp(new PlayOff\MatchUp($match->getLeft()->getWinner(), $match->getRight()->getWinner()));
         });
+        if ($this->finalMatch->isCompleted() && !$this->thirdPlaceMatch->isCompleted()) {
+            $this->thirdPlaceMatch = new Match\PlayOffMatch($this);
+            $this->thirdPlaceMatch->setMatchUp(new PlayOff\MatchUp(
+                $this->finalMatch->getLeft()->getLoser(),
+                $this->finalMatch->getRight()->getLoser()
+            ));
+        }
+    }
+
+    /**
+     * @return Match\PlayOffMatch
+     */
+    public function getThirdPlaceMatch(): Match\PlayOffMatch
+    {
+        return $this->thirdPlaceMatch;
+    }
+
+    /**
+     * @return array
+     */
+    public function getFinalRating(): array
+    {
+        if (!$this->isPlayOffComplete()) {
+            throw new IllegalStateException('Not all play-off games completed');
+        }
+        $res = [];
+        $res[] = $this->finalMatch->getWinner();
+        $res[] = $this->finalMatch->getLoser();
+        $res[] = $this->thirdPlaceMatch->getWinner();
+        $res[] = $this->thirdPlaceMatch->getLoser();
+        // sort remaining by totalScore
+        foreach ($this->teams->matching(Criteria::create()->orderBy(['totalScore' => Criteria::DESC])) as $team) {
+            if (!\in_array($team, $res, true)) {
+                continue;
+            }
+            $res[] = $team;
+        }
+
+        return $res;
     }
 }

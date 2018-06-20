@@ -99,6 +99,13 @@ abstract class Match
     {
         return $this->result->getFirstScore() > $this->result->getSecondScore() ? $this->first : $this->second;
     }
+    /**
+     * @return TournamentTeam
+     */
+    public function getLoser(): TournamentTeam
+    {
+        return $this->result->getFirstScore() > $this->result->getSecondScore() ? $this->second : $this->first;
+    }
 
     /**
      * @return UuidInterface
