@@ -6,6 +6,7 @@ namespace Mogo;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\Criteria;
+use Doctrine\ORM\Mapping as ORM;
 use Mogo\Exception\IllegalStateException;
 use Mogo\Exception\InvalidArgument;
 use Mogo\Tournament\Match;
@@ -18,39 +19,57 @@ use Ramsey\Uuid\UuidInterface;
 /**
  * Class Tournament
  * @package Mogo
+ * @ORM\Entity
+ * @ORM\Table(name="tournaments")
  */
 class Tournament
 {
     /**
      * @var UuidInterface
+     * @ORM\Id()
+     * @ORM\Column(type="uuid")
      */
     private $id;
     /**
-     * @var Collection|Match[]
+     * @var string
+     * @ORM\Column(type="string", length=50)
+     */
+    private $name;
+    /**
+     * @var Collection|Match\RegularMatch[]
+     * @ORM\OneToMany(targetEntity="Mogo\Tournament\Match\RegularMatch", mappedBy="tournament", cascade={"PERSIST"})
      */
     private $regularMatches;
     /**
      * Root node of playoff matches binary tree
      *
      * @var Tournament\Match\PlayOffMatch|null
+     * @ORM\OneToOne(targetEntity="Mogo\Tournament\Match\PlayOffMatch", inversedBy="tournament", cascade={"PERSIST"})
      */
     private $finalMatch;
     /**
      * @todo Maybe, for more flexible model here should be list with games 3/4, 5/6, ...
      * @var Tournament\Match\PlayOffMatch
+     * @ORM\OneToOne(targetEntity="Mogo\Tournament\Match\PlayOffMatch", inversedBy="tournament", cascade={"PERSIST"})
      */
     private $thirdPlaceMatch;
     /**
      * @var Collection|TournamentTeam[]
+     * @ORM\OneToMany(targetEntity="Mogo\Tournament\TournamentTeam", mappedBy="tournament", cascade={"PERSIST"})
      */
     private $teams;
 
     /**
      * Tournament constructor.
+     * @param string $name
      */
-    public function __construct()
+    public function __construct(string $name)
     {
+        if (empty(\trim($name))) {
+            throw new InvalidArgument('Tournament name should not be empty');
+        }
         $this->id = Uuid::uuid4();
+        $this->name = $name;
         $this->regularMatches = new ArrayCollection();
         $this->teams = new ArrayCollection();
         $this->thirdPlaceMatch = new Match\PlayOffMatch($this);
@@ -222,7 +241,7 @@ class Tournament
     public function getFinalRating(): array
     {
         if (!$this->isPlayOffComplete()) {
-            throw new IllegalStateException('Not all play-off games completed');
+            throw new IllegalStateException('Not all play-off matches completed');
         }
         $res = [];
         $res[] = $this->finalMatch->getWinner();

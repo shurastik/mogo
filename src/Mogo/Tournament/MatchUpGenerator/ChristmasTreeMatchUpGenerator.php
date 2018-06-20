@@ -35,12 +35,12 @@ class ChristmasTreeMatchUpGenerator implements MatchUpGenerator
      */
     public function create(Selectable $teams): array
     {
-        $divisionATeams = $teams->matching($this->createBestDivisionTeamsCriteria('A'));
-        $divisionBTeams = $teams->matching($this->createBestDivisionTeamsCriteria('B'));
+        $divisionATeams = $teams->matching($this->createBestDivisionTeamsCriteria('A'))->toArray();
+        $divisionBTeams = $teams->matching($this->createBestDivisionTeamsCriteria('B'))->toArray();
 
         $res = [];
-        foreach ($divisionATeams as $i => $team) {
-            $res[] = new MatchUp($team, $divisionBTeams->get($this->divisionTeamsCount - $i - 1));
+        while ($divisionATeams) {
+            $res[] = new MatchUp(\array_shift($divisionATeams), \array_pop($divisionBTeams));
         }
 
         return $res;

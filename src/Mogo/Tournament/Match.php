@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Mogo\Tournament;
 
+use Doctrine\ORM\Mapping as ORM;
 use Mogo\Exception\IllegalStateException;
 use Mogo\Team;
 use Mogo\Tournament;
@@ -13,27 +14,39 @@ use Ramsey\Uuid\UuidInterface;
 /**
  * Class Match
  * @package Mogo
+ * @ORM\Entity
+ * @ORM\Table(name="matches")
+ * @ORM\InheritanceType(value="SINGLE_TABLE")
+ * @ORM\DiscriminatorColumn(name="type", type="string")
+ * @ORM\DiscriminatorMap(value={"tournament" = "Mogo\Tournament\Match\RegularMatch","playoff" = "Mogo\Tournament\Match\PlayOffMatch"})
  */
 abstract class Match
 {
     /**
      * @var UuidInterface
+     * @ORM\Id()
+     * @ORM\Column(type="uuid")
      */
     protected $id;
     /**
      * @var Tournament
+     * @ORM\ManyToOne(targetEntity="Mogo\Tournament")
+     * @ORM\JoinColumn(name="tournament_id", referencedColumnName="id", nullable=false)
      */
     protected $tournament;
     /**
      * @var TournamentTeam
+     * @ORM\ManyToOne(targetEntity="Mogo\Tournament\TournamentTeam", cascade={"PERSIST"})
      */
     protected $first;
     /**
      * @var TournamentTeam
+     * @ORM\ManyToOne(targetEntity="Mogo\Tournament\TournamentTeam", cascade={"PERSIST"})
      */
     protected $second;
     /**
      * @var Result
+     * @ORM\Embedded(class="Mogo\Tournament\Match\Result")
      */
     protected $result;
 
@@ -44,6 +57,7 @@ abstract class Match
     public function __construct(Tournament $tournament) {
         $this->id = Uuid::uuid4();
         $this->tournament = $tournament;
+        $this->result = new Tournament\Match\NullResult();
     }
 
     /**
@@ -67,7 +81,7 @@ abstract class Match
      */
     public function getResult(): ?Result
     {
-        return $this->result;
+        return $this->result->isEmpty() ? null : $this->result;
     }
 
     /**
@@ -97,6 +111,10 @@ abstract class Match
      */
     public function getWinner(): TournamentTeam
     {
+        if (!$this->isCompleted()) {
+            throw new IllegalStateException('Match is not completed yet');
+        }
+
         return $this->result->getFirstScore() > $this->result->getSecondScore() ? $this->first : $this->second;
     }
     /**
@@ -104,6 +122,10 @@ abstract class Match
      */
     public function getLoser(): TournamentTeam
     {
+        if (!$this->isCompleted()) {
+            throw new IllegalStateException('Match is not completed yet');
+        }
+
         return $this->result->getFirstScore() > $this->result->getSecondScore() ? $this->second : $this->first;
     }
 
@@ -120,6 +142,6 @@ abstract class Match
      */
     public function isCompleted(): bool
     {
-        return null !== $this->result;
+        return !$this->result->isEmpty();
     }
 }

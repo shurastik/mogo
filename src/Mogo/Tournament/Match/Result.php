@@ -3,22 +3,26 @@ declare(strict_types=1);
 
 namespace Mogo\Tournament\Match;
 
+use Doctrine\ORM\Mapping as ORM;
 use Mogo\Exception\InvalidArgument;
 
 /**
  * Class Result
  * @package Mogo\Tournament\Match
+ * @ORM\Embeddable()
  */
 class Result
 {
     /**
      * @var int
+     * @ORM\Column(type="integer", nullable=true)
      */
-    private $firstScore;
+    protected $firstScore;
     /**
      * @var int
+     * @ORM\Column(type="integer", nullable=true)
      */
-    private $secondScore;
+    protected $secondScore;
 
     /**
      * Result constructor.
@@ -51,5 +55,13 @@ class Result
     public function getSecondScore(): int
     {
         return $this->secondScore;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isEmpty(): bool
+    {
+        return false;
     }
 }

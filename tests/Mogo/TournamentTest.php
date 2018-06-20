@@ -19,7 +19,7 @@ class TournamentTest extends CommonTestCase
      */
     public function tournamentResults(): void
     {
-        $tournament = new Tournament();
+        $tournament = new Tournament('Test');
         for ($i = 0; $i < 8; $i++) {
             $tournament->addTeam($this->teams[$i], 'A');
         }
@@ -56,7 +56,7 @@ class TournamentTest extends CommonTestCase
      */
     public function playoff(): void
     {
-        $tournament = new Tournament();
+        $tournament = new Tournament('Test');
         $teams = [
             new TournamentTeam('A', new Team('Test 1'), $tournament),
             new TournamentTeam('B', new Team('Test 2'), $tournament),

@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Mogo\Tournament\Match;
 
+use Doctrine\ORM\Mapping as ORM;
 use Mogo\Tournament;
 use Mogo\Tournament\Match;
 use Mogo\Tournament\PlayOff\MatchUp;
@@ -11,19 +12,18 @@ use Ramsey\Uuid\UuidInterface;
 /**
  * Class PlayoffMatch
  * @package Mogo\Tournament\Match
+ * @ORM\Entity()
  */
 class PlayOffMatch extends Match
 {
     /**
-     * @var Match
-     */
-    private $match;
-    /**
      * @var PlayOffMatch
+     * @ORM\OneToOne(targetEntity="Mogo\Tournament\Match\PlayOffMatch", cascade={"PERSIST"})
      */
     private $left;
     /**
      * @var PlayOffMatch
+     * @ORM\OneToOne(targetEntity="Mogo\Tournament\Match\PlayOffMatch", cascade={"PERSIST"})
      */
     private $right;
 
@@ -74,22 +74,6 @@ class PlayOffMatch extends Match
     public function isLeaf(): bool
     {
         return null === $this->left && null === $this->right;
-    }
-
-    /**
-     * @return Match
-     */
-    public function getMatch(): Match
-    {
-        return $this->match;
-    }
-
-    /**
-     * @param Match $match
-     */
-    public function setMatch(Match $match): void
-    {
-        $this->match = $match;
     }
 
     /**
