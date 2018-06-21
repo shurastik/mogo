@@ -1,0 +1,22 @@
+
+{% for match in matches %}
+    {% if match.firstId == first.id and match.secondId == second.id %}
+        {% if match.completed %}
+            {{ match.firstScore }}:{{ match.secondScore }}
+        {% else %}
+            <form action="{{ path('finish_match', {'id': tournament.id, 'matchId': match.id}) }}" class="form-inline" method="post">
+                {% spaceless %}
+                <input type="text" style="width: 40px;" class="form-control form-control-sm" name="firstScore">:
+                <input style="width: 40px;"  type="text" class="form-control form-control-sm" name="secondScore">
+                <input type="submit" class="btn btn-secondary btn-sm" value="OK">
+                {% endspaceless %}
+            </form>
+        {% endif %}
+    {% elseif match.firstId == second.id and match.secondId == first.id %}
+        {% if match.completed %}
+            {{ match.secondScore }}:{{ match.firstScore }}
+        {% else %}
+            -
+        {% endif %}
+    {% endif %}
+{% endfor %}

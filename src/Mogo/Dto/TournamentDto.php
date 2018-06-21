@@ -27,8 +27,8 @@ class TournamentDto
     public static function from(Tournament $tournament): self
     {
         $res = new self();
-        $res->id = $tournament->getId();
-        $res->name = $tournament->getName();
+        $res->id = $tournament->getId()->toString();
+        $res->name = (string)$tournament;
 
         return $res;
     }

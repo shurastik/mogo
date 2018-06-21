@@ -42,9 +42,21 @@ class Result
     }
 
     /**
+     * @return Result
+     */
+    public static function nullResult(): self
+    {
+        $res = new self(0, 1);
+        $res->firstScore = null;
+        $res->secondScore = null;
+
+        return $res;
+    }
+
+    /**
      * @return int
      */
-    public function getFirstScore(): int
+    public function getFirstScore(): ?int
     {
         return $this->firstScore;
     }
@@ -52,7 +64,7 @@ class Result
     /**
      * @return int
      */
-    public function getSecondScore(): int
+    public function getSecondScore(): ?int
     {
         return $this->secondScore;
     }
@@ -62,6 +74,6 @@ class Result
      */
     public function isEmpty(): bool
     {
-        return false;
+        return null === $this->firstScore && null === $this->secondScore;
     }
 }

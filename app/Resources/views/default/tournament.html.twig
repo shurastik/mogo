@@ -2,6 +2,40 @@
 
 {% block body %}
 
-<h1>{{ tournament.name }}</h1>
+    <a href="{{ path('homepage') }}">Return</a>
 
+    <h1>{{ page.tournament.name }}</h1>
+    {% for divisionName, divisionMatches in page.divisions %}
+        <div class="container">
+            <h2>Division {{ divisionName }}</h2>
+            <form action="{{ path('fill_division', { 'id': page.tournament.id, 'division': divisionName }) }}" method="post">
+                <button type="submit" class="btn btn-primary">Fill with random</button>
+            </form>
+            <br>
+            <table class="table table-bordered">
+                <thead>
+                    <th scope="col">Teams</th>
+                    {% for team in page.teams if team.division == divisionName %}
+                        <th scope="col">{{ team.name }}</th>
+                    {% endfor %}
+                    <th scope="col">Score</th>
+                </thead>
+                <tbody>
+                    {% for firstTeam in page.teams if firstTeam.division == divisionName %}
+                        <tr>
+                            <td scope="row">{{ firstTeam.name }}</td>
+                            {% for secondTeam in page.teams  if secondTeam.division == divisionName %}
+                                {% if firstTeam.id == secondTeam.id %}
+                                    <td class="table-secondary"></td>
+                                {% else %}
+                                    <td>{% include 'default/match.html.twig' with {'tournament': page.tournament, 'first':firstTeam, 'second':secondTeam, 'matches': divisionMatches} %}</td>
+                                {% endif %}
+                            {% endfor %}
+                            <td scope="row">{{ firstTeam.totalScore }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% endfor %}
 {% endblock %}

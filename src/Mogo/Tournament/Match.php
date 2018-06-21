@@ -57,7 +57,7 @@ abstract class Match
     public function __construct(Tournament $tournament) {
         $this->id = Uuid::uuid4();
         $this->tournament = $tournament;
-        $this->result = new Tournament\Match\NullResult();
+        $this->result = Result::nullResult();
     }
 
     /**

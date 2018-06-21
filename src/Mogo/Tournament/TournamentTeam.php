@@ -92,4 +92,20 @@ class TournamentTeam
     {
         return $this->totalScore;
     }
+
+    /**
+     * @return UuidInterface
+     */
+    public function getId(): UuidInterface
+    {
+        return $this->id;
+    }
+
+    /**
+     * @return string
+     */
+    public function __toString(): string
+    {
+        return (string)$this->team;
+    }
 }

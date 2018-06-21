@@ -119,6 +119,20 @@ class Tournament
     }
 
     /**
+     * @param UuidInterface $id
+     * @return Match
+     */
+    public function getMatchById(UuidInterface $id): Match
+    {
+        foreach ($this->regularMatches as $match) {
+            if ($match->getId()->equals($id)) {
+                return $match;
+            }
+        }
+        throw new InvalidArgument('Match not found');
+    }
+
+    /**
      * @return Collection|TournamentTeam[]
      */
     public function getTeams(): Collection
@@ -273,5 +287,26 @@ class Tournament
     public function getName(): string
     {
         return $this->name;
+    }
+
+    /**
+     * @return string
+     */
+    public function __toString(): string
+    {
+        return $this->getName();
+    }
+
+    /**
+     * @param string $division
+     * @return Collection|Match\RegularMatch[]
+     */
+    public function getDivisionMatches(string $division): Collection
+    {
+        return $this->regularMatches->filter(
+            function (Match\RegularMatch $match) use ($division) {
+                return $match->getFirst()->getDivision() === $division;
+            }
+        );
     }
 }

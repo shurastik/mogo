@@ -1,5 +1,7 @@
 {% extends 'base.html.twig' %}
 
+{% form_theme createTournamentFrom 'bootstrap_4_layout.html.twig' %}
+
 {% block body %}
 
     <form action="">
@@ -15,10 +17,12 @@
         </div>
     </form>
 
+    <h2>Create new tournament</h2>
 
-    <form action="">
+    {{ form_start(createTournamentFrom) }}
+    {{ form_widget(createTournamentFrom) }}
+    {{ form_end(createTournamentFrom) }}
 
-    </form>
 {% endblock %}
 
 

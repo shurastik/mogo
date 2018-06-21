@@ -39,6 +39,12 @@ services:
         factory: ['@doctrine.orm.default_entity_manager', getRepository]
         arguments:
             - Mogo\Tournament
+
+    Mogo\Repository\TeamRepository:
+        factory: ['@doctrine.orm.default_entity_manager', getRepository]
+        arguments:
+            - Mogo\Team
     Mogo\TournamentService:
         arguments:
             - '@Mogo\Repository\TournamentRepository'
+            - '@Mogo\Repository\TeamRepository'

@@ -3,8 +3,12 @@ declare(strict_types=1);
 
 namespace Mogo;
 
+use Mogo\Dto\CreateTournamentCommand;
 use Mogo\Dto\TournamentDto;
+use Mogo\Dto\TournamentPageDto;
+use Mogo\Repository\TeamRepository;
 use Mogo\Repository\TournamentRepository;
+use Mogo\Tournament\Match\Result;
 use Ramsey\Uuid\Uuid;
 
 /**
@@ -16,15 +20,21 @@ class TournamentService
     /**
      * @var TournamentRepository
      */
-    private $repository;
+    private $tournamentRepository;
+    /**
+     * @var TeamRepository
+     */
+    private $teamRepository;
 
     /**
      * TournamentService constructor.
      * @param TournamentRepository $repository
+     * @param TeamRepository $teamRepository
      */
-    public function __construct(TournamentRepository $repository)
+    public function __construct(TournamentRepository $repository, TeamRepository $teamRepository)
     {
-        $this->repository = $repository;
+        $this->tournamentRepository = $repository;
+        $this->teamRepository = $teamRepository;
     }
 
     /**
@@ -34,14 +44,48 @@ class TournamentService
     {
         return \array_map(
             [TournamentDto::class, 'from'],
-            $this->repository->findBy([], ['name' => 'ASC'])
+            $this->tournamentRepository->findBy([], ['name' => 'ASC'])
         );
     }
 
-    public function find(string $id)
+    /**
+     * @param string $id
+     * @return TournamentPageDto
+     * @throws \Doctrine\ORM\NoResultException
+     */
+    public function find(string $id): TournamentPageDto
     {
-        $tournament = $this->repository->find(Uuid::fromString($id));
+        $tournament = $this->tournamentRepository->get(Uuid::fromString($id));
 
-        return $tournament;
+        return TournamentPageDto::from($tournament);
+    }
+
+    /**
+     * @param CreateTournamentCommand $command
+     * @return TournamentDto
+     */
+    public function create(CreateTournamentCommand $command): TournamentDto
+    {
+        $tournament = new Tournament($command->name);
+        foreach ($this->teamRepository->findBy([], ['name' => 'ASC']) as $i => $team) {
+            $tournament->addTeam($team, 0 === $i % 2 ? 'A' : 'B');
+        }
+        $this->tournamentRepository->save($tournament);
+
+        return TournamentDto::from($tournament);
+    }
+
+    /**
+     * @param string $id
+     * @param string $matchId
+     * @param Result $result
+     * @throws \Doctrine\ORM\NoResultException
+     */
+    public function finishMatch(string $id, string $matchId, Result $result): void
+    {
+        $tournament = $this->tournamentRepository->get(Uuid::fromString($id));
+        $tournament->getMatchById(Uuid::fromString($matchId))
+            ->complete($result);
+        $this->tournamentRepository->save($tournament);
     }
 }

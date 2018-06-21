@@ -4,13 +4,14 @@ declare(strict_types=1);
 namespace Mogo;
 
 use Doctrine\ORM\Mapping as ORM;
+use Mogo\Exception\InvalidArgument;
 use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidInterface;
 
 /**
  * Class Team
  * @package Mogo
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass="Mogo\Repository\TeamRepository")
  * @ORM\Table(name="teams")
  */
 class Team
@@ -33,8 +34,19 @@ class Team
      */
     public function __construct(string $name)
     {
+        if (empty(\trim($name))) {
+            throw new InvalidArgument('Team name should not be empty');
+        }
         $this->id = Uuid::uuid4();
         $this->name = $name;
+    }
+
+    /**
+     * @return UuidInterface
+     */
+    public function getId(): UuidInterface
+    {
+        return $this->id;
     }
 
     /**
