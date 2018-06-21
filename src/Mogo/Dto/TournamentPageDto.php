@@ -20,7 +20,7 @@ class TournamentPageDto
      */
     public $teams = [];
     /**
-     * @var array
+     * @var MatchDto[][]
      */
     public $divisions = [];
 

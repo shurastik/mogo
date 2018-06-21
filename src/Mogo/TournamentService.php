@@ -9,6 +9,7 @@ use Mogo\Dto\TournamentPageDto;
 use Mogo\Repository\TeamRepository;
 use Mogo\Repository\TournamentRepository;
 use Mogo\Tournament\Match\Result;
+use Mogo\Tournament\TournamentTeam;
 use Ramsey\Uuid\Uuid;
 
 /**

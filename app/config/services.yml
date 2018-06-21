@@ -48,3 +48,8 @@ services:
         arguments:
             - '@Mogo\Repository\TournamentRepository'
             - '@Mogo\Repository\TeamRepository'
+
+    Mogo\Tournament\Match\ResultProvider:
+        class: Mogo\Tournament\Match\ResultProvider\RandomResultProvider
+        arguments:
+            - 10

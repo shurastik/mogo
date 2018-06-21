@@ -28,11 +28,10 @@ class RandomResultProvider implements ResultProvider
     }
 
     /**
-     * @param Team $host
-     * @param Team $guest
+     * @param string $matchId
      * @return Result
      */
-    public function provide(Team $host, Team $guest): Result
+    public function provide(string $matchId): Result
     {
         $hostScore = \random_int(0, $this->maxScore);
         do {
