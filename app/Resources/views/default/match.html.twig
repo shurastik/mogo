@@ -1,6 +1,6 @@
 
 {% for match in matches %}
-    {% if match.firstId == first.id and match.secondId == second.id %}
+    {% if match.first.id == firstId and match.second.id == secondId %}
         {% if match.completed %}
             {{ match.firstScore }}:{{ match.secondScore }}
         {% else %}
@@ -12,7 +12,7 @@
                 {% endspaceless %}
             </form>
         {% endif %}
-    {% elseif match.firstId == second.id and match.secondId == first.id %}
+    {% elseif match.first.id == secondId and match.second.id == firstId %}
         {% if match.completed %}
             {{ match.secondScore }}:{{ match.firstScore }}
         {% else %}

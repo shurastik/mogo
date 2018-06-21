@@ -3,12 +3,10 @@ declare(strict_types=1);
 
 namespace Mogo\Tournament\MatchUpGenerator;
 
-use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\Common\Collections\Selectable;
 use Mogo\Tournament\MatchUpGenerator;
 use Mogo\Tournament\PlayOff\MatchUp;
-use Mogo\Tournament\TournamentTeam;
 
 /**
  * Class ChristmasTreeMatchUpGenerator :)

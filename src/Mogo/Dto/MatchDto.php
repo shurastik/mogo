@@ -16,13 +16,13 @@ class MatchDto
      */
     public $id;
     /**
-     * @var string
+     * @var TournamentTeamDto|null
      */
-    public $firstId;
+    public $first;
     /**
-     * @var string
+     * @var TournamentTeamDto|null
      */
-    public $secondId;
+    public $second;
     /**
      * @var int|null
      */
@@ -40,8 +40,10 @@ class MatchDto
     {
         $res = new self();
         $res->id = $match->getId()->toString();
-        $res->firstId = $match->getFirst()->getId()->toString();
-        $res->secondId = $match->getSecond()->getId()->toString();
+        if ($match->getFirst()) {
+            $res->first = TournamentTeamDto::from($match->getFirst());
+            $res->second = TournamentTeamDto::from($match->getSecond());
+        }
         if ($match->isCompleted()) {
             $res->completed = true;
             $res->firstScore = $match->getResult()->getFirstScore();

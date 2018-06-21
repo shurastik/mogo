@@ -1,5 +1,7 @@
 {% extends 'base.html.twig' %}
 
+
+
 {% block body %}
 
     <a href="{{ path('homepage') }}">Return</a>
@@ -28,7 +30,7 @@
                                 {% if firstTeam.id == secondTeam.id %}
                                     <td class="table-secondary"></td>
                                 {% else %}
-                                    <td>{% include 'default/match.html.twig' with {'tournament': page.tournament, 'first':firstTeam, 'second':secondTeam, 'matches': divisionMatches} %}</td>
+                                    <td>{% include 'default/match.html.twig' with {'tournament': page.tournament, 'firstId':firstTeam.id, 'secondId':secondTeam.id, 'matches': divisionMatches} %}</td>
                                 {% endif %}
                             {% endfor %}
                             <td scope="row">{{ firstTeam.totalScore }}</td>
@@ -38,4 +40,50 @@
             </table>
         </div>
     {% endfor %}
+
+    <h2>Play-off</h2>
+    {% if page.playOffStarted %}
+        <form action="{{ path('fill_playoff', { 'id': page.tournament.id }) }}" method="post">
+            <button type="submit" class="btn btn-primary">Fill with random</button>
+        </form>
+        <br>
+        <div class="container">
+            <div class="row  align-items-center">
+                {% set totalRows = page.playOffGames[0]|length %}
+                {% for index,levelMatches in page.playOffGames %}
+                    <div class="col-sm">
+                        {% for playOffMatch in levelMatches %}
+                            <div class="row justify-content-center"  style="border: 1px solid grey; padding: 20px; margin: 10px;">
+                                {% include 'default/playoff-match.html.twig' with {'tournament': page.tournament, 'playOffMatch': playOffMatch} %}
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+        <h3>Match for 3-4 place</h3>
+        {% include 'default/playoff-match.html.twig' with {'tournament': page.tournament, 'playOffMatch': page.thirdPlaceMatch} %}
+    {% else %}
+        <div class="alert alert-warning" role="alert">Not all regular matches completed</div>
+    {% endif %}
+
+    <h2>Result</h2>
+    {% if page.playOffCompleted %}
+        <table class="table table-bordered">
+            <thead>
+                <th scope="col">Place</th>
+                <th scope="col">Team</th>
+            </thead>
+            <tbody>
+                {% for team in page.ratingList %}
+                    <tr>
+                        <td>{{ loop.index }}</td>
+                        <td>{{ team.name }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <div class="alert alert-warning" role="alert">Not all play-off matches completed</div>
+    {% endif %}
 {% endblock %}

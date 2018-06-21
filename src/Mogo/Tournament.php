@@ -129,6 +129,12 @@ class Tournament
                 return $match;
             }
         }
+        if ($this->thirdPlaceMatch->getId()->equals($id)) {
+            return $this->thirdPlaceMatch;
+        }
+        if ($res = $this->finalMatch->findNodeById($id)) {
+            return $res;
+        }
         throw new InvalidArgument('Match not found');
     }
 
@@ -152,6 +158,14 @@ class Tournament
     }
 
     /**
+     * @return bool
+     */
+    public function isPlayOffCanBeStarted(): bool
+    {
+        return $this->allRegularMatchesCompleted() && !$this->isPlayOffStarted();
+    }
+
+    /**
      * @param MatchUpGenerator $matchUpGenerator
      */
     public function startPlayoff(MatchUpGenerator $matchUpGenerator): void
@@ -163,7 +177,7 @@ class Tournament
             throw new IllegalStateException('Not all regular matches completed');
         }
         $matchUps = $matchUpGenerator->create($this->teams);
-        $this->finalMatch = Tournament\Match\PlayOffMatch::createTree($this, (int)\sqrt(\count($matchUps) * 2));
+        $this->finalMatch = Tournament\Match\PlayOffMatch::createTree($this, (int)\log(\count($matchUps) * 2, 2));
         $this->finalMatch->forEachLeaf(
             function (Tournament\Match\PlayOffMatch $node) use (&$matchUps) {
                 $node->setMatchUp(\array_shift($matchUps));
@@ -233,7 +247,6 @@ class Tournament
             $match->setMatchUp(new PlayOff\MatchUp($match->getLeft()->getWinner(), $match->getRight()->getWinner()));
         });
         if ($this->finalMatch->isCompleted() && !$this->thirdPlaceMatch->isCompleted()) {
-            $this->thirdPlaceMatch = new Match\PlayOffMatch($this);
             $this->thirdPlaceMatch->setMatchUp(new PlayOff\MatchUp(
                 $this->finalMatch->getLeft()->getLoser(),
                 $this->finalMatch->getRight()->getLoser()
@@ -250,7 +263,7 @@ class Tournament
     }
 
     /**
-     * @return array
+     * @return TournamentTeam[]
      */
     public function getFinalRating(): array
     {

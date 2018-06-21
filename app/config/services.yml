@@ -53,3 +53,8 @@ services:
         class: Mogo\Tournament\Match\ResultProvider\RandomResultProvider
         arguments:
             - 10
+
+    Mogo\Tournament\MatchUpGenerator:
+        class: Mogo\Tournament\MatchUpGenerator\ChristmasTreeMatchUpGenerator
+        arguments:
+            - 4

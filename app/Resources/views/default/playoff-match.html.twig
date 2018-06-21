@@ -1,0 +1,8 @@
+<div>
+    {% if playOffMatch.match.first and playOffMatch.match.second %}
+        {{ playOffMatch.match.first.name }} vs {{  playOffMatch.match.second.name }} &dash;
+        {% include 'default/match.html.twig' with {'tournament': tournament, 'firstId':playOffMatch.match.first.id, 'secondId':playOffMatch.match.second.id, 'matches': [playOffMatch.match]} %}
+    {% else  %}
+        Competitors unknown
+    {% endif %}
+</div>

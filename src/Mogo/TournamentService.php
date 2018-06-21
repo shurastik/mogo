@@ -9,6 +9,7 @@ use Mogo\Dto\TournamentPageDto;
 use Mogo\Repository\TeamRepository;
 use Mogo\Repository\TournamentRepository;
 use Mogo\Tournament\Match\Result;
+use Mogo\Tournament\MatchUpGenerator;
 use Mogo\Tournament\TournamentTeam;
 use Ramsey\Uuid\Uuid;
 
@@ -26,16 +27,22 @@ class TournamentService
      * @var TeamRepository
      */
     private $teamRepository;
+    /**
+     * @var MatchUpGenerator
+     */
+    private $playOffMatchupGenerator;
 
     /**
      * TournamentService constructor.
      * @param TournamentRepository $repository
      * @param TeamRepository $teamRepository
+     * @param MatchUpGenerator $matchUpGenerator
      */
-    public function __construct(TournamentRepository $repository, TeamRepository $teamRepository)
+    public function __construct(TournamentRepository $repository, TeamRepository $teamRepository, MatchUpGenerator $matchUpGenerator)
     {
         $this->tournamentRepository = $repository;
         $this->teamRepository = $teamRepository;
+        $this->playOffMatchupGenerator = $matchUpGenerator;
     }
 
     /**
@@ -87,6 +94,10 @@ class TournamentService
         $tournament = $this->tournamentRepository->get(Uuid::fromString($id));
         $tournament->getMatchById(Uuid::fromString($matchId))
             ->complete($result);
+        if ($tournament->isPlayOffCanBeStarted()) {
+            $tournament->startPlayoff($this->playOffMatchupGenerator);
+        }
+
         $this->tournamentRepository->save($tournament);
     }
 }

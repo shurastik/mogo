@@ -41,4 +41,17 @@ class GeneratorController extends Controller
 
         return $this->redirectToRoute('tournament', ['id' => $id]);
     }
+
+    /**
+     * @Route("/{id}/fillPlayOff", requirements={"id": "[^/]+"},  methods={"POST"}, name="fill_playoff")
+     * @param string $id
+     * @return Response
+     * @throws \Doctrine\ORM\NoResultException
+     */
+    public function fillPlayOffAction(string $id): Response
+    {
+        $this->generator->fillTournamentPlayOff($id);
+
+        return $this->redirectToRoute('tournament', ['id' => $id]);
+    }
 }

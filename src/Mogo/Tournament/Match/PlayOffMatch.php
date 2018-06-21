@@ -37,9 +37,9 @@ class PlayOffMatch extends Match
     }
 
     /**
-     * @return PlayOffMatch
+     * @return PlayOffMatch|null
      */
-    public function getLeft(): PlayOffMatch
+    public function getLeft(): ?PlayOffMatch
     {
         return $this->left;
     }
@@ -53,9 +53,9 @@ class PlayOffMatch extends Match
     }
 
     /**
-     * @return PlayOffMatch
+     * @return PlayOffMatch|null
      */
-    public function getRight(): PlayOffMatch
+    public function getRight(): ?PlayOffMatch
     {
         return $this->right;
     }
@@ -133,6 +133,9 @@ class PlayOffMatch extends Match
     {
         if ($this->id->equals($id)) {
             return $this;
+        }
+        if (null === $this->left) {
+            return null;
         }
         if (null !== ($found = $this->left->findNodeById($id))) {
             return $found;
