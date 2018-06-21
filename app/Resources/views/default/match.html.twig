@@ -16,7 +16,13 @@
         {% if match.completed %}
             {{ match.secondScore }}:{{ match.firstScore }}
         {% else %}
-            -
+            <form action="{{ path('finish_match', {'id': tournament.id, 'matchId': match.id}) }}" class="form-inline" method="post">
+                {% spaceless %}
+                    <input type="text" style="width: 40px;" class="form-control form-control-sm" name="secondScore">:
+                    <input style="width: 40px;"  type="text" class="form-control form-control-sm" name="firstScore">
+                    <input type="submit" class="btn btn-secondary btn-sm" value="OK">
+                {% endspaceless %}
+            </form>
         {% endif %}
     {% endif %}
 {% endfor %}
